@@ -27,3 +27,8 @@ class catalog(models.Model):
 
 class register(models.Model):
     name = models.CharField(max_length=200)
+class Person(models.Model):
+    name = models.CharField(max_length=130)
+    email = models.EmailField(blank=True)
+    job_title = models.CharField(max_length=30, blank=True)
+    bio = models.TextField(blank=True)
