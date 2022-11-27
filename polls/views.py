@@ -1,15 +1,16 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, HttpResponseRedirect
-from django.views.generic import CreateView
-from .models import Person
-from .forms import UserRegistrationForm
+from .forms import UserRegistrationForm, UpdateUserForm, UpdateProfileForm
 from .models import Question, Choice
+from django.urls import reverse_lazy
+from django.contrib.auth.views import PasswordChangeView
+from django.contrib.messages.views import SuccessMessageMixin
+from django.contrib.auth.decorators import login_required
 from django.template import loader
 from django.urls import reverse
 from django.views import generic
-from django.views.generic import UpdateView
-from polls.models import Person
-from polls.forms import PersonForm
+from django.contrib import messages
+
 from django.contrib.auth.forms import UserCreationForm
 
 
@@ -44,9 +45,14 @@ def vote(request, question_id):
         selected_choice.votes += 1
         selected_choice.save()
         return HttpResponseRedirect(reverse('polls:results', args=(question.id,)))
-def show_home(request):
 
-        return render(request, 'catalog/index.html')
+
+def show_home(request):
+    return render(request, 'catalog/base.html')
+
+
+def index(request):
+    return render(request, 'catalog/index.html')
 
 
 # Функция регистрации
@@ -64,17 +70,31 @@ def register(request):
             new_user.save()
             return render(request, 'catalog/register_done.html', {'new_user': new_user})
     else:
-         user_form = UserRegistrationForm()
+        user_form = UserRegistrationForm()
     return render(request, 'catalog/register.html', {'user_form': user_form})
-def login(request):
-    return render(request, 'catalog/login.html')
-class PersonCreateView(CreateView):
-    model = Person
-    fields = ('name', 'email', 'job_title', 'bio')
-
-class PersonUpdateView(UpdateView):
-    model = Person
-    form_class = PersonForm
-    template_name = 'catalog/person_update_form.html'
 
 
+@login_required
+def profile(request):
+    if request.method == 'POST':
+        user_form = UpdateUserForm(request.POST, instance=request.user)
+
+        profile_form = UpdateProfileForm(request.POST, request.FILES, instance=request.user.profile)
+
+        if user_form.is_valid() and profile_form.is_valid():
+            user_form.save()
+            profile_form.save()
+            messages.success(request, 'Your profile is updated successfully')
+            return redirect(to='profile')
+    else:
+        user_form = UpdateUserForm(instance=request.user)
+
+        profile_form = UpdateProfileForm(instance=request.user.profile)
+
+    return render(request, 'polls/profile.html', {'user_form': user_form, 'profile_form': profile_form})
+
+
+class ChangePasswordView(SuccessMessageMixin, PasswordChangeView):
+    template_name = 'polls/change_password.html'
+    success_message = "Successfully Changed Your Password"
+    success_url = reverse_lazy('show_home')

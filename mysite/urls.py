@@ -13,21 +13,25 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from operator import index
-from polls.views import PersonCreateView, PersonUpdateView
+from polls.views import profile, index
 from django.contrib import admin
+from polls.views import ChangePasswordView
 from django.template.defaulttags import url
 from django.urls import include, path
 from django import forms
 from polls import views
-from polls.views import show_home
+from polls.views import show_home, ChangePasswordView
+from django.conf import settings
+from django.conf.urls.static import static
+
 
 urlpatterns = [
     path('polls/', include('polls.urls')),
     path('admin/', admin.site.urls),
     path('', show_home),
     path('catalog/register/', views.register, name='register'),
-    path('catalog/login/', views.login, name='login'),
-    path('add/', PersonCreateView.as_view(), name='person_add'),
-    path('<int:pk>/edit/', PersonUpdateView.as_view(), name='person_edit'),
-]
+    path('accounts/', include('django.contrib.auth.urls')),
+    path('catalog/index/', index),
+    path('profile/', profile, name='profile'),
+    path('password-change/', ChangePasswordView.as_view(), name='password_change'),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

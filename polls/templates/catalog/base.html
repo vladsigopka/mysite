@@ -1,19 +1,57 @@
 {% load static %}
 {% load bootstrap4 %}
 
-<html>
+
+
+<html lang="en">
 <head>
-    <title>{% block title %}{% endblock %}</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+   {% bootstrap_css %}
+{% bootstrap_javascript jquery='slim' %}
+<title>{% block title %} Главная {% endblock %}
+</title>
+
 </head>
-<body>
-<div id="content">
-    {% block content %}
-    {% endblock %}
+
+<div class="container-fluid">
+<div class="d-flex flex-column flex-md-row p-3 px-md-4 mb-3 bg-white border-bottom box-
+shadow rounded">
+<h5 class="mr-md-auto p-2">Главная страница </h5>
+    <h5 class="mr-md-auto p-2">Добро пожаловать, {% if user.is_authenticated %}{{ user.username }}{% else %}незнакомец{% endif %}!</h5>
+<div class="nav-item dropdown p-2 ">
+{% if user.is_authenticated %}
+    <button type="button" class=" btn btn-info nav-link dropdown-toggle btn-sm" data-toggle="dropdown" aria-
+haspopup="true" aria-pressed="false" autocomplete="off">
+  профиль
+</button>
+
+<div class="dropdown-menu" style="margin-right: 7em;">
+
+<a class="dropdown-item" href="{% url 'profile' %}">Мой профиль</a>
+<a class="dropdown-item" href="#">Изменить личные данные</a>
+<a class="dropdown-item" href="#">Изменить пароль</a>
+<div class="dropdown-divider"></div>
+<a class="dropdown-item" href="{% url 'logout' %}">Выйти</a>
+<div class="dropdown-divider"></div>
+<a class="dropdown-item" href="#">Удалить</a>
 </div>
-<div id="sidebar">
-    <h2>My blog</h2>
-    <p>This is my blog.</p>
+{% else %}
+</div>
+
+<a class="p-2 text-dark" href="{% url 'register'%}"><button type="button" class="btn btn-primary nav-link btn-sm">регистрация</button></a>
+<a class="p-2 text-dark" href="{% url 'login'%}"><button type="button" class="btn btn-primary nav-link btn-sm">вход</button></a>
+    {% endif %}
+</div>
+
+    <div class="row"></div>
+</div>
+
+<div class="container">
+{% block content %}
+{% endblock %}
 </div>
 </body>
 </html>
